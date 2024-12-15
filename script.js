@@ -1,49 +1,77 @@
+let firstNum = '';
+let secondNum = '';
+let currentOperator = null;
+let shouldResetScreen = false;
+
+const digitBtn = document.querySelectorAll('.digit');
+const operatorBtn = document.querySelectorAll('.operator');
+const equalBtn = document.querySelector('.equal');
+const clearBtn = document.querySelector('.clear');
+const lastDisplay = document.querySelector('.lastDisplay');
+const currentDisplay = document.querySelector('.currentDisplay');
+
 const add = (a, b) => a + b;
 const subtract = (a, b) => a - b;
 const multiply = (a, b) => a * b;
 const divide = (a, b) => a / b;
 
-let firstNum = 0;
-let secondNum = 0;
-let operator = '';
-
 function operate(firstNum, secondNum, operator) {
-
-    let result = 0;
     switch (operator) {
         case '+':
-            result = add(firstNum, secondNum);
-            break;
+            return add(firstNum, secondNum);
         case '-':
-            result = subtract(firstNum, secondNum);
-            break;
+            return subtract(firstNum, secondNum);
         case '*':
-            result = multiply(firstNum, secondNum);
-            break;
+            return multiply(firstNum, secondNum);
         case '/':
-            result = divide(firstNum, secondNum);
-            break;
+            return divide(firstNum, secondNum);
         default:
-            break;
+            return null;
+    }
+}
+
+digitBtn.forEach((btn) =>
+    btn.addEventListener('click', () => appendDigit(btn.textContent))
+);
+
+operatorBtn.forEach((btn) =>
+    btn.addEventListener('click', () => setOperation(btn.textContent))
+);
+
+equalBtn.addEventListener('click', evaluate)
+
+function appendDigit(digit) {
+    if (shouldResetScreen) {
+        resetDisplay();
+    }
+    currentDisplay.textContent += digit;
+}
+
+
+function resetDisplay() {
+    currentDisplay.textContent = '';
+    shouldResetScreen = false;
+}
+
+
+function setOperation(operator) {
+    if (currentOperator !== null) {
+        evaluate();
     }
 
-    return result;
+    firstNum = parseFloat(currentDisplay.textContent);
+    currentOperator = operator;
+    lastDisplay.textContent = `${firstNum} ${currentOperator}`;
+    shouldResetScreen = true;
+}
+
+function evaluate() {
+    secondNum = parseFloat(currentDisplay.textContent);
+    const result = operate(firstNum, secondNum, currentOperator);
+    currentDisplay.textContent = result;
+    lastDisplay.textContent = `${firstNum} ${currentOperator} ${secondNum} = ${result}`;
+    currentOperator = null;
 
 }
 
-let userClicks = [];
-
-function addToUserClicks() {
-    userClicks.push(this.innerText);
-    populateDisplay();
-}
-
-const buttons = Array.from(document.querySelectorAll('.digit, .operator'));
-buttons.map((button) => button.addEventListener('click', addToUserClicks));
-
-
-const calculatorDisplay = document.querySelector('.calculator-display');
-function populateDisplay() {
-    calculatorDisplay.innerText = userClicks.join('');
-}
 
